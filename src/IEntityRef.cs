@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EntitySystem.Utility;
 
@@ -31,6 +32,23 @@ namespace EntitySystem
 	
 	public static class EntityRefExtensions
 	{
+		/// <summary> Gets the component of type <typeparam name="T"> of this entity
+		///           or adds and returns the default value if it doesn't exist. </summary>
+		public static T GetOrAdd<E, T>(this E entity, T @default)
+			where E : IEntityRef where T : IComponent =>
+			entity.Get<T>().Or(() => { entity.Set<T>(@default); return @default; });
+		
+		/// <summary> Gets the component of type <typeparam name="T"> of this entity
+		///           or adds and returns a default value if it doesn't exist. </summary>
+		public static T GetOrAdd<E, T>(this E entity, Func<T> defaultFactory)
+			where E : IEntityRef where T : IComponent =>
+			entity.Get<T>().Or(() => {
+				var value = defaultFactory();
+				entity.Set<T>(value);
+				return value;
+			});
+		
+		
 		/// <summary> Sets the component of type <typeparam name="T"> from this entity,
 		///           returning the previous value. This will hide the prototype's component value.
 		///           This is a utility extension method to avoid specifying the type parameter. </summary>
