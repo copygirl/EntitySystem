@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using EntitySystem.Collections;
 using EntitySystem.Components.World;
 using EntitySystem.Utility;
 
