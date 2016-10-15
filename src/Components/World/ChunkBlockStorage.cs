@@ -28,14 +28,17 @@ namespace EntitySystem.Components.World
 		}
 		
 		
-		public T Get(BlockPos relative) =>
-			Get(relative.X, relative.Y, relative.Z);
-		public T Get(int x, int y, int z) =>
+		// Direct access / manipulation
+		
+		public T GetDirect(BlockPos relative) =>
+			GetDirect(relative.X, relative.Y, relative.Z);
+		public T GetDirect(int x, int y, int z) =>
 			_storage[GetIndex(x, y, z)];
 		
-		public T Set(BlockPos relative, T value) =>
-			Set(relative.X, relative.Y, relative.Z, value);
-		public T Set(int x, int y, int z, T value) {
+		public T SetDirect(BlockPos relative, T value) =>
+			SetDirect(relative.X, relative.Y, relative.Z, value);
+		public T SetDirect(int x, int y, int z, T value)
+		{
 			var index = GetIndex(x, y, z);
 			var previous = _storage[index];
 			if (!COMPARER.Equals(default(T), previous)) NonDefaultValues--;
@@ -44,8 +47,8 @@ namespace EntitySystem.Components.World
 			return previous;
 		}
 		
-		
-		int GetIndex(int x, int y, int z) {
+		int GetIndex(int x, int y, int z)
+		{
 			#if DEBUG
 				ThrowIf.Argument.OutOfRange(x, 0, Chunk.SIZE, nameof(x), maxInclusive: false);
 				ThrowIf.Argument.OutOfRange(y, 0, Chunk.SIZE, nameof(y), maxInclusive: false);
@@ -53,5 +56,31 @@ namespace EntitySystem.Components.World
 			#endif
 			return (x | y << Chunk.BITS | z << (Chunk.BITS * 2));
 		}
+		
+		
+		// Convenience methods
+		
+		public Option<T> Get(BlockPos relative) =>
+			Get(relative.X, relative.Y, relative.Z);
+		public Option<T> Get(int x, int y, int z)
+		{
+			var value = GetDirect(x, y, z);
+			return new Option<T>(value, !COMPARER.Equals(default(T), value));
+		}
+		
+		public Option<T> Set(BlockPos relative, T value) =>
+			Set(relative.X, relative.Y, relative.Z, value);
+		public Option<T> Set(int x, int y, int z, T value)
+		{
+			var previous = SetDirect(x, y, z, value);
+			return new Option<T>(previous, !COMPARER.Equals(default(T), previous));
+		}
+		
+		public Option<T> Set(BlockPos relative, Option<T> value) => Set(relative, value.Or(default(T)));
+		public Option<T> Set(int x, int y, int z, Option<T> value) => Set(x, y, z, value.Or(default(T)));
+		
+		public Option<T> Remove(BlockPos relative) => Set(relative, default(T));
+		public Option<T> Remove(int x, int y, int z) => Set(x, y, z, default(T));
+		
 	}
 }
