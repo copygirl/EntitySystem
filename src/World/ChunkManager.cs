@@ -7,11 +7,6 @@ namespace EntitySystem.World
 {
 	public class ChunkManager
 	{
-		public const int CHUNK_SIZE = 16;
-		public const int CHUNK_BITS = 4;
-		public const int CHUNK_FLAG = ~(~0 << CHUNK_BITS);
-		
-		
 		readonly Dictionary<ChunkPos, Entity> _chunks =
 			new Dictionary<ChunkPos, Entity>();
 			
@@ -36,9 +31,9 @@ namespace EntitySystem.World
 		
 		
 		public ChunkPos GetChunkFromBlock(BlockPos pos) =>
-			new ChunkPos((pos.X >> CHUNK_BITS), (pos.Y >> CHUNK_BITS), (pos.Z >> CHUNK_BITS));
+			new ChunkPos((pos.X >> Chunk.BITS), (pos.Y >> Chunk.BITS), (pos.Z >> Chunk.BITS));
 		
 		public BlockPos GetChunkRelativeBlock(BlockPos pos) =>
-			new BlockPos((pos.X & CHUNK_FLAG), (pos.Y & CHUNK_FLAG), (pos.Z & CHUNK_FLAG));
+			new BlockPos((pos.X & Chunk.FLAG), (pos.Y & Chunk.FLAG), (pos.Z & Chunk.FLAG));
 	}
 }

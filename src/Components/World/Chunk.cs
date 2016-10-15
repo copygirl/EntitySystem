@@ -5,6 +5,11 @@ namespace EntitySystem.Components.World
 {
 	public struct Chunk : IComponent, IEquatable<Chunk>
 	{
+		public const int SIZE = 16;
+		public const int BITS = 4;
+		public const int FLAG = ~(~0 << BITS);
+		
+		
 		public ChunkPos Position { get; set; }
 		
 		public Chunk(ChunkPos position) { Position = position; }
