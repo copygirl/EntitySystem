@@ -14,7 +14,7 @@ namespace EntitySystem.World
 		
 		public EntityManager EntityManager => ChunkManager.EntityManager;
 		public ChunkRef Chunk => ChunkManager.GetChunkRef(Position);
-		public BlockPos ChunkRelPos => ChunkManager.GetChunkRelativeBlock(Position);
+		public BlockPos ChunkRelPos => ChunkManager.GetChunkRelPos(Position);
 		
 		internal BlockRef(ChunkManager chunks, BlockPos pos)
 		{

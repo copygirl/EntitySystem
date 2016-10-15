@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using EntitySystem.Components.World;
 using EntitySystem.Utility;
@@ -19,21 +18,21 @@ namespace EntitySystem.World
 		
 		
 		public BlockRef Get(BlockPos pos) => new BlockRef(this, pos);
-		public ChunkRef GetChunkRef(BlockPos pos) => GetChunkRef(GetChunkFromBlock(pos));
+		public ChunkRef GetChunkRef(BlockPos pos) => GetChunkRef(GetChunkPos(pos));
 		public ChunkRef GetChunkRef(ChunkPos pos) => new ChunkRef(this, pos);
 		
-		public Option<Entity> GetChunk(BlockPos pos) => GetChunk(GetChunkFromBlock(pos));
+		public Option<Entity> GetChunk(BlockPos pos) => GetChunk(GetChunkPos(pos));
 		public Option<Entity> GetChunk(ChunkPos pos) => _chunks[pos];
 		
-		public Entity GetOrCreateChunk(BlockPos pos) => GetOrCreateChunk(GetChunkFromBlock(pos));
+		public Entity GetOrCreateChunk(BlockPos pos) => GetOrCreateChunk(GetChunkPos(pos));
 		public Entity GetOrCreateChunk(ChunkPos pos) => _chunks.GetOrAdd(pos, (_) =>
 			EntityManager.New(new Chunk(pos)));
 		
 		
-		public ChunkPos GetChunkFromBlock(BlockPos pos) =>
+		public ChunkPos GetChunkPos(BlockPos pos) =>
 			new ChunkPos((pos.X >> Chunk.BITS), (pos.Y >> Chunk.BITS), (pos.Z >> Chunk.BITS));
 		
-		public BlockPos GetChunkRelativeBlock(BlockPos pos) =>
+		public BlockPos GetChunkRelPos(BlockPos pos) =>
 			new BlockPos((pos.X & Chunk.FLAG), (pos.Y & Chunk.FLAG), (pos.Z & Chunk.FLAG));
 	}
 }
