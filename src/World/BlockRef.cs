@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,7 +13,9 @@ namespace EntitySystem.World
 		public BlockPos Position { get; private set; }
 		
 		public EntityManager EntityManager => ChunkManager.EntityManager;
-
+		public ChunkRef Chunk => ChunkManager.GetChunkRef(Position);
+		public BlockPos ChunkRelPos => ChunkManager.GetChunkRelativeBlock(Position);
+		
 		internal BlockRef(ChunkManager chunks, BlockPos pos)
 		{
 			Debug.Assert(chunks != null);
@@ -22,29 +25,33 @@ namespace EntitySystem.World
 		
 		// IEntityRef implementation
 		
-		// TODO: BlockStorage
-		
-		public Option<Entity> Entity => ChunkManager.GetChunkRef(Position)
-			.Get<ChunkBlockEntities>().Map((blockEntities) =>
-				blockEntities.Get(ChunkManager.GetChunkRelativeBlock(Position)));
+		public Option<Entity> Entity =>
+			Chunk.Get<ChunkBlockEntities>().Map((blockEntities) =>
+				blockEntities.Get(ChunkRelPos));
 		
 		public IEnumerable<IComponent> Components =>
 			Entity.Map((block) => EntityManager[block].Components)
 				.Or(Enumerable.Empty<IComponent>())
-				// .Concat()
+				// .Concat() with ChunkBlockStorage values
 				.Follow(new Block(Position));
 		
 		public bool Has<T>() where T : IComponent =>
-			Entity.Map((chunk) => EntityManager[chunk].Has<T>())
-				.Or(false);
+			Entity.Map((block) => EntityManager[block].Has<T>())
+				.Or(() => Chunk.Has<ChunkBlockStorage<T>>());
 		
 		public Option<T> Get<T>() where T : IComponent =>
-			Entity.Map((block) => EntityManager[block].Get<T>());
+			Entity.Map((block) => EntityManager[block].Get<T>())
+				.Or(() => Chunk.Get<ChunkBlockStorage<T>>()
+					.Map((storage) => storage.Get(ChunkRelPos)));
 		
-		public Option<T> Set<T>(Option<T> value) where T : IComponent =>
-			EntityManager[ChunkManager.GetOrCreateChunk(Position)].Set<T>(value);
+		public Option<T> Set<T>(Option<T> value) where T : IComponent
+		{
+			throw new NotImplementedException();
+		}
 		
 		public Option<T> Remove<T>() where T : IComponent =>
-			Entity.Map((chunk) => EntityManager[chunk].Remove<T>());
+			Entity.Map((block) => EntityManager[block].Remove<T>())
+				.Or(() => Chunk.Get<ChunkBlockStorage<T>>()
+					.Map((storage) => storage.Set(ChunkRelPos, default(T))));
 	}
 }
