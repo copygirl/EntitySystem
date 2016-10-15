@@ -34,7 +34,8 @@ namespace EntitySystem
 		/// <summary> Sets the component of type <typeparam name="T"> from this entity,
 		///           returning the previous value. This will hide the prototype's component value.
 		///           This is a utility extension method to avoid specifying the type parameter. </summary>
-		public static Option<T> Set<T>(this IEntityRef entity, T value) where T : IComponent =>
+		public static Option<T> Set<E, T>(this E entity, T value)
+			where E : IEntityRef where T : IComponent =>
 			entity.Set(Option<T>.Some(value));
 	}
 }
