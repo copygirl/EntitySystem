@@ -13,6 +13,17 @@ namespace EntitySystem.Utility
 				return param;
 			}
 			
+			public static void OutOfRange<T>(T value, T min, T max, string paramName,
+			                                 bool minInclusive = true, bool maxInclusive = true)
+				where T : IComparable<T>
+			{
+				ThrowIf.Argument.IsNull(value, paramName);
+				if ((value.CompareTo(min) < (minInclusive ? 0 :  1)) ||
+				    (value.CompareTo(max) > (maxInclusive ? 0 : -1)))
+					throw new ArgumentOutOfRangeException(paramName, value,
+						$"{ paramName } ({ value }) is out of range ({ min } - { max })");
+			}
+			
 			public static void IsInvalidArrayIndex(Array array, int index,
 				string arrayParamName = "array", string indexParamName = "index")
 			{
