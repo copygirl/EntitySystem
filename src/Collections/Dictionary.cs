@@ -206,17 +206,23 @@ namespace EntitySystem.Collections
 			int hashCode = Comparer.GetHashCode(key) & 0x7FFFFFFF;
 			found    = false;
 			previous = -1;
-			bucket   = (hashCode % _buckets.Length);
+			bucket   = -1;
 			
 			// Search through existing buckets.
 			if (_buckets != null) {
+				bucket = (hashCode % _buckets.Length);
 				for (var i = _buckets[bucket]; i >= 0; previous = i, i = _entries[i].Next)
 					if ((_entries[i].HashCode == hashCode) && Comparer.Equals(_entries[i].Key, key))
 						{ found = true; return i; }
-			// If no buckets and we don't want to create, return.
-			} else if (!create) return -1;
-			// Otherwise initialize the buckets.
-			else Initialize(0);
+				// If we didn't find the matching key and we
+				// don't want to create a new entry, return.
+				if (!create) return -1;
+			// If no buckets and we want to create, initialize.
+			} else if (create) {
+				Initialize(0);
+				bucket = (hashCode % _buckets.Length);
+			// Otherwise bail out!
+			} else return -1;
 			
 			int index;
 			if (_freeCount > 0) {
@@ -225,8 +231,8 @@ namespace EntitySystem.Collections
 				_freeCount--;
 			} else {
 				if (_count == _entries.Length) {
-					bucket = (hashCode % _buckets.Length);
 					Resize();
+					bucket = (hashCode % _buckets.Length);
 				}
 				index = _count;
 				_count++;
@@ -366,9 +372,9 @@ namespace EntitySystem.Collections
 			
 			bool ICollection<TValue>.IsReadOnly => true;
 			
-			void ICollection<TValue>.Add(TValue value) { throw new NotSupportedException(KEYS_READONLY); }
-			void ICollection<TValue>.Clear() { throw new NotSupportedException(KEYS_READONLY); }
-			bool ICollection<TValue>.Remove(TValue value) { throw new NotSupportedException(KEYS_READONLY); }
+			void ICollection<TValue>.Add(TValue value) { throw new NotSupportedException(VALUES_READONLY); }
+			void ICollection<TValue>.Clear() { throw new NotSupportedException(VALUES_READONLY); }
+			bool ICollection<TValue>.Remove(TValue value) { throw new NotSupportedException(VALUES_READONLY); }
 			
 			void ICollection<TValue>.CopyTo(TValue[] array, int index) => array.CopyFrom(index, Count, this);
 			
