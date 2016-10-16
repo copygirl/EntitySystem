@@ -46,8 +46,8 @@ namespace EntitySystem.Utility
 					$"{ indexParamName } ({ index }) is before the beginning of { arrayParamName }");
 				if (length < 0) throw new ArgumentOutOfRangeException(lengthParamName, length,
 					$"{ lengthParamName } ({ length }) is negative");
-				if (index + length > array.GetUpperBound(0)) throw new ArgumentException(
-					$"{ indexParamName } + { lengthParamName } ({ index } + { length }) is after the end of { arrayParamName } ({ array.GetUpperBound(0) })");
+				if (index + length - 1 > array.GetUpperBound(0)) throw new ArgumentException(
+					$"{ indexParamName } + { lengthParamName } - 1 ({ index } + { length } - 1) is after the end of { arrayParamName } ({ array.GetUpperBound(0) })");
 			}
 		}
 		
