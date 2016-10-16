@@ -21,19 +21,19 @@ namespace EntitySystem
 		public EntityRef this[Entity entity] => new EntityRef(this, entity);
 		
 		
-		public Entity New()
+		public EntityRef New()
 		{
 			var components = new TypedCollection<IComponent>();
 			while (true) {
 				var entity = new Entity(unchecked(_entityIdCounter++));
 				if (!_entities.TryAdd(entity, components).HasValue)
-					return entity;
+					return new EntityRef(this, entity);
 			}
 		}
 		
-		public Entity New(params IComponent[] components)
+		public EntityRef New(params IComponent[] components)
 		{
-			var entity = new EntityRef(this, New());
+			var entity = New();
 			// Add all components dynamically using reflection (slow)
 			var method = typeof(EntityRefExtensions).GetTypeInfo()
 				.GetMethod(nameof(EntityRefExtensions.Set));
