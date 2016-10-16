@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using EntitySystem.Components.World;
@@ -79,5 +78,10 @@ namespace EntitySystem.World
 				.Or(() => Chunk.Get<ChunkBlockStorage<T>>()
 					.Map((storage) => storage.Remove(ChunkRelPos)));
 		}
+		
+		
+		// ToString
+		
+		public override string ToString() => $"[{ nameof(BlockRef) } { Position }]";
 	}
 }

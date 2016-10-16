@@ -58,9 +58,6 @@ namespace EntitySystem
 			internal EntityRef(EntityManager manager, Entity entity)
 				{ _manager = manager; _entity = entity; }
 			
-			public static implicit operator Entity(
-				EntityRef entityRef) => entityRef._entity;
-			
 			// IEntityRef implementation
 			
 			public Option<Entity> Entity => _entity;
@@ -83,6 +80,14 @@ namespace EntitySystem
 			
 			public Option<T> Remove<T>() where T : IComponent =>
 				Set(Option<T>.None);
+			
+			// ToString / Casting
+			
+			public override string ToString() =>
+				_entity.ToString().Replace(nameof(_entity), nameof(EntityRef));
+			
+			public static implicit operator Entity(
+				EntityRef entityRef) => entityRef._entity;
 		}
 		
 		public class EntityNonExistantException : Exception

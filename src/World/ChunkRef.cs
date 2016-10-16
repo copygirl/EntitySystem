@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using EntitySystem.Utility;
 
@@ -38,5 +37,9 @@ namespace EntitySystem.World
 		
 		public Option<T> Remove<T>() where T : IComponent =>
 			Entity.Map((chunk) => EntityManager[chunk].Remove<T>());
+		
+		// ToString
+		
+		public override string ToString() => $"[{ nameof(ChunkRef) } { Position }]";
 	}
 }
