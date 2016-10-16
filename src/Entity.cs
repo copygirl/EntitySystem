@@ -20,5 +20,7 @@ namespace EntitySystem
 		public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
 		
 		public override int GetHashCode() => _id.GetHashCode();
+		
+		public override string ToString() => $"[Entity { _id :X}]";
 	}
 }
