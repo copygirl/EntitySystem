@@ -7,11 +7,10 @@ using EntitySystem.Utility;
 
 namespace EntitySystem
 {
-	using EntityDictionary = EntitySystem.Collections.Dictionary<Entity, TypedCollection<IComponent>>;
-	
 	public class EntityManager
 	{
-		readonly EntityDictionary _entities = new EntityDictionary();
+		readonly OptionDictionary<Entity, TypedCollection<IComponent>> _entities =
+			new OptionDictionary<Entity, TypedCollection<IComponent>>();
 		
 		uint _entityIdCounter = 1;
 		

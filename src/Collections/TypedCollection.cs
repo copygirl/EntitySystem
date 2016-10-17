@@ -7,11 +7,11 @@ namespace EntitySystem.Collections
 {
 	public class TypedCollection<T> : IEnumerable<T>
 	{
-		readonly Dictionary<Type, T> _dict;
+		readonly OptionDictionary<Type, T> _dict;
 		
 		public TypedCollection() : this(0) {  }
 		public TypedCollection(int capacity)
-			{ _dict = new Dictionary<Type, T>(capacity); }
+			{ _dict = new OptionDictionary<Type, T>(capacity); }
 		
 		public TypedCollection(ICollection<T> collection)
 			: this(collection?.Count ?? 0)

@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using EntitySystem.Collections;
 using EntitySystem.Utility;
 using EntitySystem.World;
 
 namespace EntitySystem.Components.World
 {
-	using BlockEntityDictionary = EntitySystem.Collections.Dictionary<BlockPos, Entity>;
-	
 	public class ChunkBlockEntities : IComponent, IReadOnlyCollection<Entity>
 	{
-		readonly BlockEntityDictionary _entities = new BlockEntityDictionary();
+		readonly OptionDictionary<BlockPos, Entity> _entities = new OptionDictionary<BlockPos, Entity>();
 		
 		
 		public Option<Entity> Get(BlockPos relative) => _entities[relative];

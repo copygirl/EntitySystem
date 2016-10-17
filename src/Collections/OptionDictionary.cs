@@ -7,7 +7,7 @@ using EntitySystem.Utility;
 
 namespace EntitySystem.Collections
 {
-	public class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
+	public class OptionDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
 	{
 		static readonly string KEY_EXISTS      = "The specified key is already present in this dictionary";
 		static readonly string KEY_NONEXISTANT = "The specified key is not present in this dictionary";
@@ -56,10 +56,10 @@ namespace EntitySystem.Collections
 		
 		// Constructors
 		
-		public Dictionary() : this(0, null) {  }
-		public Dictionary(int capacity) : this(capacity, null) {  }
-		public Dictionary(IEqualityComparer<TKey> comparer) : this(0, comparer) {  }
-		public Dictionary(int capacity, IEqualityComparer<TKey> comparer)
+		public OptionDictionary() : this(0, null) {  }
+		public OptionDictionary(int capacity) : this(capacity, null) {  }
+		public OptionDictionary(IEqualityComparer<TKey> comparer) : this(0, comparer) {  }
+		public OptionDictionary(int capacity, IEqualityComparer<TKey> comparer)
 		{
 			if (capacity < 0) throw new ArgumentException(
 				"Capacity must be non-negative", nameof(capacity));
@@ -67,8 +67,8 @@ namespace EntitySystem.Collections
 			Comparer = comparer ?? EqualityComparer<TKey>.Default;
 		}
 		
-		public Dictionary(IDictionary<TKey, TValue> dict) : this(dict, null) {  }
-		public Dictionary(IDictionary<TKey, TValue> dict, IEqualityComparer<TKey> comparer)
+		public OptionDictionary(IDictionary<TKey, TValue> dict) : this(dict, null) {  }
+		public OptionDictionary(IDictionary<TKey, TValue> dict, IEqualityComparer<TKey> comparer)
 			: this(dict?.Count ?? 0, comparer)
 		{
 			ThrowIf.Argument.IsNull(dict, nameof(dict));
@@ -332,11 +332,11 @@ namespace EntitySystem.Collections
 		
 		public sealed class KeyCollection : ICollection<TKey>, IReadOnlyCollection<TKey>
 		{
-			readonly Dictionary<TKey, TValue> _dict;
+			readonly OptionDictionary<TKey, TValue> _dict;
 			
 			public int Count => _dict.Count;
 			
-			internal KeyCollection(Dictionary<TKey, TValue> dict) { _dict = dict; }
+			internal KeyCollection(OptionDictionary<TKey, TValue> dict) { _dict = dict; }
 			
 			public bool Contains(TKey key) => _dict.ContainsKey(key);
 			
@@ -360,11 +360,11 @@ namespace EntitySystem.Collections
 		
 		public sealed class ValueCollection : ICollection<TValue>, IReadOnlyCollection<TValue>
 		{
-			readonly Dictionary<TKey, TValue> _dict;
+			readonly OptionDictionary<TKey, TValue> _dict;
 			
 			public int Count => _dict.Count;
 			
-			internal ValueCollection(Dictionary<TKey, TValue> dict) { _dict = dict; }
+			internal ValueCollection(OptionDictionary<TKey, TValue> dict) { _dict = dict; }
 			
 			public bool Contains(TValue value) => _dict.ContainsValue(value);
 			
