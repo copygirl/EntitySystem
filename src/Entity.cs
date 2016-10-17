@@ -21,6 +21,6 @@ namespace EntitySystem
 		
 		public override int GetHashCode() => _id.GetHashCode();
 		
-		public override string ToString() => $"[{ nameof(Entity) } { _id :X}]";
+		public override string ToString() => $"[{ nameof(Entity) } { _id }]";
 	}
 }

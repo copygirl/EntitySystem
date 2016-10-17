@@ -20,5 +20,7 @@ namespace EntitySystem.Components.World
 		public static bool operator !=(Block left, Block right) => !left.Equals(right);
 		
 		public override int GetHashCode() => Position.GetHashCode();
+		
+		public override string ToString() => $"[{ nameof(Block) } { Position }]";
 	}
 }

@@ -20,6 +20,9 @@ namespace EntitySystem.Components
 		
 		public override int GetHashCode() => Value.GetHashCode();
 		
+		public override string ToString() =>
+			Value.ToString().Replace(nameof(Entity), nameof(Prototype));
+		
 		
 		public static implicit operator Entity(Prototype prototype) => prototype.Value;
 		

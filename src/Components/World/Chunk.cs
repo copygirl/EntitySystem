@@ -25,5 +25,7 @@ namespace EntitySystem.Components.World
 		public static bool operator !=(Chunk left, Chunk right) => !left.Equals(right);
 		
 		public override int GetHashCode() => Position.GetHashCode();
+		
+		public override string ToString() => $"[{ nameof(Chunk) } { Position }]";
 	}
 }
