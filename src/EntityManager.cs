@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,15 +8,13 @@ using EntitySystem.Utility;
 
 namespace EntitySystem
 {
-	public class EntityManager
+	public class EntityManager : IEnumerable<EntityManager.EntityRef>, IEnumerable<Entity>
 	{
 		readonly OptionDictionary<Entity, TypedCollection<IComponent>> _entities =
 			new OptionDictionary<Entity, TypedCollection<IComponent>>();
 		
 		uint _entityIdCounter = 1;
 		
-		
-		public IEnumerable<Entity> Entities => _entities.Keys.Select(x => x);
 		
 		public EntityRef this[Entity entity] => new EntityRef(this, entity);
 		
@@ -45,6 +44,18 @@ namespace EntitySystem
 		public void Remove(Entity entity) =>
 			_entities.TryRemove(entity).Expect(
 				() => new EntityNonExistantException(entity));
+		
+		
+		// IEnumerable implementation
+		
+		public IEnumerator<EntityRef> GetEnumerator() =>
+			_entities.Keys.Select((entity) => this[entity]).GetEnumerator();
+		
+		IEnumerator<Entity> IEnumerable<Entity>.GetEnumerator() =>
+			_entities.Keys.GetEnumerator();
+		
+		IEnumerator IEnumerable.GetEnumerator() =>
+			((IEnumerable<Entity>)this).GetEnumerator();
 		
 		
 		public class EntityRef : IEntityRef
