@@ -8,13 +8,15 @@ using EntitySystem.Utility;
 
 namespace EntitySystem
 {
-	public class EntityManager : IEnumerable<EntityManager.EntityRef>, IEnumerable<Entity>
+	public class EntityManager : IEnumerable<EntityManager.EntityRef>
 	{
 		readonly OptionDictionary<Entity, TypedCollection<IComponent>> _entities =
 			new OptionDictionary<Entity, TypedCollection<IComponent>>();
 		
 		uint _entityIdCounter = 1;
 		
+		
+		public IEnumerable<Entity> Entities => _entities.Keys;
 		
 		public EntityRef this[Entity entity] => new EntityRef(this, entity);
 		
@@ -51,11 +53,7 @@ namespace EntitySystem
 		public IEnumerator<EntityRef> GetEnumerator() =>
 			_entities.Keys.Select((entity) => this[entity]).GetEnumerator();
 		
-		IEnumerator<Entity> IEnumerable<Entity>.GetEnumerator() =>
-			_entities.Keys.GetEnumerator();
-		
-		IEnumerator IEnumerable.GetEnumerator() =>
-			((IEnumerable<Entity>)this).GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		
 		
 		public class EntityRef : IEntityRef
