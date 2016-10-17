@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using EntitySystem.Collections;
@@ -13,7 +14,11 @@ namespace EntitySystem.Components.World
 		
 		public Option<Entity> Get(BlockPos relative) => _entities[relative];
 		
-		public void Add(BlockPos relative, Entity entity) => _entities.Add(relative, entity);
+		public Entity Add(BlockPos relative, Entity entity)
+			{ _entities.Add(relative, entity); return entity; }
+		
+		public Entity GetOrAdd(BlockPos relative, Func<Entity> entityFactory) =>
+			_entities.GetOrAdd(relative, (_) => entityFactory());
 		
 		public Entity Remove(BlockPos relative) => _entities.Remove(relative);
 		

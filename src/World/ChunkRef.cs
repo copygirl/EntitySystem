@@ -20,7 +20,7 @@ namespace EntitySystem.World
 		
 		// IEntityRef implementation
 		
-		public Option<Entity> Entity => ChunkManager.GetChunk(Position);
+		public Option<Entity> Entity => ChunkManager.GetChunkEntity(Position);
 		
 		public IEnumerable<IComponent> Components =>
 			Entity.Map((chunk) => EntityManager[chunk].Components)
@@ -33,7 +33,7 @@ namespace EntitySystem.World
 			Entity.Map((chunk) => EntityManager[chunk].Get<T>());
 		
 		public Option<T> Set<T>(Option<T> value) where T : IComponent =>
-			EntityManager[ChunkManager.GetOrCreateChunk(Position)].Set<T>(value);
+			EntityManager[ChunkManager.GetOrCreateChunkEntity(Position)].Set<T>(value);
 		
 		public Option<T> Remove<T>() where T : IComponent =>
 			Entity.Map((chunk) => EntityManager[chunk].Remove<T>());
