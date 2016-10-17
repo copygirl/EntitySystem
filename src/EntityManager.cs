@@ -79,7 +79,7 @@ namespace EntitySystem
 				Get<T>().HasValue;
 			
 			public Option<T> Get<T>() where T : IComponent =>
-				_manager._entities[_entity].Map((components) => components.Get<T>());
+				_manager._entities[_entity].Map((components) => components.TryGet<T>());
 			
 			public Option<T> Set<T>(Option<T> value) where T : IComponent =>
 				_manager._entities[_entity].Expect(
