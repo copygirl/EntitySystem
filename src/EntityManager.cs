@@ -59,7 +59,7 @@ namespace EntitySystem
 			
 			// IEntityRef implementation
 			
-			public Option<Entity> Entity => _entity;
+			public Option<Entity> Entity => new Option<Entity>(_entity, Exists);
 			
 			public IEnumerable<IComponent> Components =>
 				_manager._entities[_entity]
