@@ -24,7 +24,7 @@ namespace EntitySystem.Utility
 			{ if (HasValue) return _value; else throw func(); }
 		
 		public void ExpectNone(Func<Exception> func)
-			{ if (!HasValue) throw func(); }
+			{ if (HasValue) throw func(); }
 		
 		
 		public T Or(T @default) => (HasValue ? Value : @default);
