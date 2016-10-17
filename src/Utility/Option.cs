@@ -72,6 +72,6 @@ namespace EntitySystem.Utility
 			(HasValue ? (_value?.GetHashCode() ?? 0) : 0);
 		
 		public override string ToString() =>
-			(typeof(Option<T>).Name + "." + (HasValue ? "Some" : "None"));
+			$"{ GetType().GetFriendlyName() }.{ Map((value) => $"Some( { value.ToString()} )").Or("None") }";
 	}
 }
