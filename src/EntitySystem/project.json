@@ -5,21 +5,18 @@
 	"authors": [ "copygirl" ],
 	
 	"buildOptions": {
-		"debugType": "portable",
-		"emitEntryPoint": true
+		"debugType": "portable"
 	},
 	
 	"dependencies": { },
 	
 	"frameworks": {
-		"netcoreapp1.0": {
+		"netstandard1.6": {
 			"dependencies": {
-				"Microsoft.NETCore.App": {
-					"type": "platform",
-					"version": "1.0.1"
-				}
-			},
-			"imports": "dnxcore50"
+				"NETStandard.Library": "1.6.0",
+				"System.Dynamic.Runtime": "4.0.11",
+				"Microsoft.CSharp": "4.0.1"
+			}
 		}
 	}
 }
