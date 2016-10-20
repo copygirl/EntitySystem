@@ -5,7 +5,7 @@ namespace EntitySystem.Components.World
 {
 	public struct Block : IComponent, IEquatable<Block>
 	{
-		public BlockPos Position { get; set; }
+		public BlockPos Position { get; }
 		
 		public Block(BlockPos position) { Position = position; }
 		

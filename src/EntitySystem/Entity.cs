@@ -4,14 +4,14 @@ namespace EntitySystem
 {
 	public struct Entity : IEquatable<Entity>, IComparable<Entity>
 	{
-		readonly uint _id;
+		public uint ID { get; }
 		
-		internal Entity(uint id) { _id = id; }
+		internal Entity(uint id) { ID = id; }
 		
 		
-		public bool Equals(Entity other) => (_id == other._id);
+		public bool Equals(Entity other) => (ID == other.ID);
 		
-		public int CompareTo(Entity other) => _id.CompareTo(other._id);
+		public int CompareTo(Entity other) => ID.CompareTo(other.ID);
 		
 		public override bool Equals(object obj) => ((obj is Entity) && Equals((Entity)obj));
 		
@@ -19,8 +19,8 @@ namespace EntitySystem
 		
 		public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
 		
-		public override int GetHashCode() => _id.GetHashCode();
+		public override int GetHashCode() => ID.GetHashCode();
 		
-		public override string ToString() => $"[{ nameof(Entity) } { _id }]";
+		public override string ToString() => $"[{ nameof(Entity) } { ID }]";
 	}
 }

@@ -7,8 +7,8 @@ namespace EntitySystem.World
 {
 	public class ChunkManager
 	{
-		public EntityManager EntityManager { get; private set; }
-		public StorageRegistry Storage { get; private set; }
+		public EntityManager EntityManager { get; }
+		public StorageRegistry Storage { get; }
 		
 		public ChunkManager(EntityManager entityManager)
 		{

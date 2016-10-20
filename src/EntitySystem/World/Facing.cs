@@ -29,14 +29,14 @@ namespace EntitySystem.World
 		
 		readonly byte _id;
 		
-		public int XOffset { get { return _offsetTable[_id, 0]; } }
-		public int YOffset { get { return _offsetTable[_id, 1]; } }
-		public int ZOffset { get { return _offsetTable[_id, 2]; } }
+		public int XOffset => _offsetTable[_id, 0];
+		public int YOffset => _offsetTable[_id, 1];
+		public int ZOffset => _offsetTable[_id, 2];
 		
-		public bool IsHorizontal { get { return ((_id >= 1) && (_id <= 4)); } }
-		public bool IsVertical { get { return (_id >= 5); } }
+		public bool IsHorizontal => ((_id >= 1) && (_id <= 4));
+		public bool IsVertical => (_id >= 5);
 		
-		public string Name { get { return _nameLookup[_id]; } }
+		public string Name => _nameLookup[_id];
 		
 		private Facing(byte id) { _id = id; }
 		

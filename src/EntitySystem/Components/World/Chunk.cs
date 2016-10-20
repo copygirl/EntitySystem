@@ -10,7 +10,7 @@ namespace EntitySystem.Components.World
 		public const int FLAG = ~(~0 << BITS);
 		
 		
-		public ChunkPos Position { get; set; }
+		public ChunkPos Position { get; }
 		
 		public Chunk(ChunkPos position) { Position = position; }
 		

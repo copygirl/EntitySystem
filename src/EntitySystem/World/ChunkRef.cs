@@ -6,8 +6,8 @@ namespace EntitySystem.World
 {
 	public class ChunkRef : IEntityRef
 	{
-		public ChunkManager ChunkManager { get; private set; }
-		public ChunkPos Position { get; private set; }
+		public ChunkManager ChunkManager { get; }
+		public ChunkPos Position { get; }
 		
 		public EntityManager EntityManager => ChunkManager.EntityManager;
 		

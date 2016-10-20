@@ -8,9 +8,9 @@ namespace EntitySystem.World
 		public static readonly BlockPos ORIGIN = new BlockPos(0, 0, 0);
 		
 		
-		public int X { get; private set; }
-		public int Y { get; private set; }
-		public int Z { get; private set; }
+		public int X { get; }
+		public int Y { get; }
+		public int Z { get; }
 		
 		public BlockPos(int x, int y, int z) { X = x; Y = y; Z = z; }
 		

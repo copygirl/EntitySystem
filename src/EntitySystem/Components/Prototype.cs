@@ -4,7 +4,7 @@ namespace EntitySystem.Components
 {
 	public struct Prototype : IComponent, IEquatable<Prototype>
 	{
-		public Entity Value { get; set; }
+		public Entity Value { get; }
 		
 		public Prototype(Entity value) { Value = value; }
 		

@@ -39,7 +39,7 @@ namespace EntitySystem.Collections
 		KeyCollection _keys = null;
 		ValueCollection _values = null;
 		
-		public IEqualityComparer<TKey> Comparer { get; private set; }
+		public IEqualityComparer<TKey> Comparer { get; }
 		
 		public int Count => (_count - _freeCount);
 		

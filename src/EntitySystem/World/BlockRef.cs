@@ -9,8 +9,8 @@ namespace EntitySystem.World
 {
 	public class BlockRef : IEntityRef
 	{
-		public ChunkManager ChunkManager { get; private set; }
-		public BlockPos Position { get; private set; }
+		public ChunkManager ChunkManager { get; }
+		public BlockPos Position { get; }
 		
 		public EntityManager EntityManager => ChunkManager.EntityManager;
 		public ChunkRef Chunk => ChunkManager.GetChunk(Position);

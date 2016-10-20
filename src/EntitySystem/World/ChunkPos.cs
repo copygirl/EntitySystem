@@ -5,9 +5,9 @@ namespace EntitySystem.World
 {
 	public struct ChunkPos : IEquatable<ChunkPos>
 	{
-		public int X { get; private set; }
-		public int Y { get; private set; }
-		public int Z { get; private set; }
+		public int X { get; }
+		public int Y { get; }
+		public int Z { get; }
 		
 		public ChunkPos(int x, int y, int z) { X = x; Y = y; Z = z; }
 		
