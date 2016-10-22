@@ -44,8 +44,9 @@ namespace EntitySystem.World
 				.Concat(GetBlockStorageComponents());
 		
 		public bool Has<T>() where T : IComponent =>
-			Entity.Map((block) => EntityManager[block].Has<T>())
-				.Or(() => Chunk.Has<ChunkBlockStorage<T>>());
+			(typeof(T) == typeof(Block)) ||
+				Entity.Map((block) => EntityManager[block].Has<T>())
+					.Or(() => Chunk.Has<ChunkBlockStorage<T>>());
 		
 		public Option<T> Get<T>() where T : IComponent =>
 			(typeof(T) == typeof(Block)) ? (T)(object)new Block(Position) :

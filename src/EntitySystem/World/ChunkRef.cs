@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using EntitySystem.Components.World;
 using EntitySystem.Utility;
 
 namespace EntitySystem.World
@@ -24,19 +26,29 @@ namespace EntitySystem.World
 		
 		public IEnumerable<IComponent> Components =>
 			Entity.Map((chunk) => EntityManager[chunk].Components)
-				.Or(Enumerable.Empty<IComponent>());
+				.Or(() => new IComponent[]{ new Chunk(Position) }.AsEnumerable());
 		
 		public bool Has<T>() where T : IComponent =>
-			Entity.Map((chunk) => EntityManager[chunk].Has<T>()).Or(false);
+			(typeof(T) == typeof(Chunk)) ||
+				Entity.Map((chunk) => EntityManager[chunk].Has<T>()).Or(false);
 		
 		public Option<T> Get<T>() where T : IComponent =>
-			Entity.Map((chunk) => EntityManager[chunk].Get<T>());
+			(typeof(T) == typeof(Chunk)) ? (T)(object)new Chunk(Position) :
+				Entity.Map((chunk) => EntityManager[chunk].Get<T>());
 		
-		public Option<T> Set<T>(Option<T> value) where T : IComponent =>
-			EntityManager[ChunkManager.GetOrCreateChunkEntity(Position)].Set<T>(value);
+		public Option<T> Set<T>(Option<T> value) where T : IComponent
+		{
+			if (typeof(T) == typeof(Chunk)) throw new InvalidOperationException(
+				$"{ nameof(Chunk) } cannot be modified");
+			return EntityManager[ChunkManager.GetOrCreateChunkEntity(Position)].Set<T>(value);
+		}
 		
-		public Option<T> Remove<T>() where T : IComponent =>
-			Entity.Map((chunk) => EntityManager[chunk].Remove<T>());
+		public Option<T> Remove<T>() where T : IComponent
+		{
+			if (typeof(T) == typeof(Chunk)) throw new InvalidOperationException(
+				$"{ nameof(Chunk) } cannot be modified");
+			return Entity.Map((chunk) => EntityManager[chunk].Remove<T>());
+		}
 		
 		// ToString
 		
