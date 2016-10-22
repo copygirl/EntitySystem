@@ -1,0 +1,19 @@
+{
+	"version": "0.1.0",
+	"command": "dotnet",
+	"isShellCommand": true,
+	"args": [ ],
+	"tasks": [{
+		"taskName": "build",
+		"args": [ "**/project.json" ],
+		"isBuildCommand": true,
+		"showOutput": "always",
+		"problemMatcher": "$msCompile"
+	}, {
+		"taskName": "test",
+		"args": [ "test/EntitySystem.Tests/project.json" ],
+		"isBuildCommand": true,
+		"showOutput": "always",
+		"problemMatcher": "$msCompile"
+	}]
+}
