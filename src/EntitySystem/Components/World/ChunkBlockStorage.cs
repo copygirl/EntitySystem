@@ -6,7 +6,14 @@ using EntitySystem.World;
 
 namespace EntitySystem.Components.World
 {
-	public class ChunkBlockStorage<T> : IComponent
+	public interface IChunkBlockStorage
+	{
+		int NonDefaultValues { get; }
+		
+		Option<IComponent> Get(BlockPos relative);
+	}
+	
+	public class ChunkBlockStorage<T> : IComponent, IChunkBlockStorage
 		where T : IComponent
 	{
 		const int STORAGE_SIZE = Chunk.SIZE * Chunk.SIZE * Chunk.SIZE;
@@ -82,5 +89,10 @@ namespace EntitySystem.Components.World
 		public Option<T> Remove(BlockPos relative) => Set(relative, default(T));
 		public Option<T> Remove(int x, int y, int z) => Set(x, y, z, default(T));
 		
+		
+		// IChunkBlockStorage implementation
+		
+		Option<IComponent> IChunkBlockStorage.Get(BlockPos relative) =>
+			Get(relative).Cast<IComponent>();
 	}
 }

@@ -67,8 +67,6 @@ namespace EntitySystem.World
 		public interface IStorageHandler
 		{
 			Type ComponentType { get; }
-			bool HasNonDefault(Entity chunk);
-			dynamic Get(Entity chunk);
 		}
 		
 		public class StorageHandler<T> : IStorageHandler where T : IComponent
@@ -88,13 +86,6 @@ namespace EntitySystem.World
 				
 			public ChunkBlockStorage<T> GetOrAdd(Entity chunk) =>
 				_entities[chunk].GetOrAdd(() => new ChunkBlockStorage<T>());
-			
-			
-			public bool HasNonDefault(Entity chunk) =>
-				Get(chunk).Map((blockStorage) =>
-					(blockStorage.NonDefaultValues > 0)).Or(false);
-					
-			dynamic IStorageHandler.Get(Entity chunk) => Get(chunk);
 		}
 	}
 }

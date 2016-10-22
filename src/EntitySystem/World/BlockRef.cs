@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using EntitySystem.Components.World;
 using EntitySystem.Utility;
 
@@ -25,20 +24,8 @@ namespace EntitySystem.World
 		
 		IEnumerable<IComponent> GetBlockStorageComponents() =>
 			Chunk.Components
-				.Select((component) =>
-					(IsChunkBlockStorage(component)
-						? (IComponent)((dynamic)component)
-							.Get(ChunkRelPos)
-							.Cast<IComponent>()
-							.Or((IComponent)null)
-						: null))
+				.Select((component) => (component as IChunkBlockStorage)?.Get(ChunkRelPos).OrDefault())
 				.Where((component) => (component != null));
-		
-		static bool IsChunkBlockStorage(IComponent component)
-		{
-			var typeInfo = component.GetType().GetTypeInfo();
-			return (typeInfo.IsGenericType && (typeInfo.GetGenericTypeDefinition() == typeof(ChunkBlockStorage<>)));
-		}
 		
 		Entity GetOrCreateEntity() =>
 			Chunk.GetOrAdd(() => new ChunkBlockEntities())
