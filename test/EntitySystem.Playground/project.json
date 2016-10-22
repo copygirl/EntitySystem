@@ -1,0 +1,28 @@
+{
+	"name": "EntitySystem.Playground",
+	"version": "1.0.0-*",
+	"description": "",
+	"authors": [ "copygirl" ],
+	
+	"testRunner": "xunit",
+	"buildOptions": {
+		"debugType": "portable",
+		"emitEntryPoint": true
+	},
+	
+	"dependencies": {
+		"EntitySystem": { "target": "project" }
+	},
+	
+	"frameworks": {
+		"netcoreapp1.0": {
+			"dependencies": {
+				"Microsoft.NETCore.App": {
+					"type": "platform",
+					"version": "1.0.1"
+				}
+			},
+			"imports": "dnxcore50"
+		}
+	}
+}
