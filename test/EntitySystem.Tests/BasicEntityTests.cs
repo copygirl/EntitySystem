@@ -15,21 +15,27 @@ namespace EntitySystem.Tests
 			var entity = Entities.New();
 			Assert.Equal(Entities.Count(), 1);
 			
-			// Adding component
+			// Empty entity
+			Assert.False(entity.Has<TestComponent>());
 			Assert.Equal(entity.Components.Count(), 0);
+			
+			// Adding component
 			entity.Set(new TestComponent(10));
 			Assert.Equal(entity.Components.Count(), 1);
 			
 			// Getting component
+			Assert.True(entity.Has<TestComponent>());
 			Assert.Equal(entity.Get<TestComponent>(), new TestComponent(10));
-			Assert.Equal(entity.Components.First(), new TestComponent(10));
+			Assert.Contains(new TestComponent(10), entity.Components);
 			
 			// Removing component
 			entity.Remove<TestComponent>();
+			Assert.False(entity.Has<TestComponent>());
 			Assert.Equal(entity.Components.Count(), 0);
 			
 			// Removing entity
 			Entities.Remove(entity);
+			Assert.False(entity.Exists);
 			Assert.Equal(Entities.Count(), 0);
 		}
 		

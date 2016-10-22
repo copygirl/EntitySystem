@@ -1,7 +1,10 @@
+using System;
 using System.Linq;
 using EntitySystem.Components.World;
+using EntitySystem.Utility;
 using EntitySystem.World;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace EntitySystem.Tests
 {
@@ -9,11 +12,13 @@ namespace EntitySystem.Tests
 	{
 		public EntityManager Entities { get; }
 		public ChunkManager Chunks { get; }
+		public ITestOutputHelper Output { get; }
 		
-		public BasicChunkTests()
+		public BasicChunkTests(ITestOutputHelper output)
 		{
 			Entities = new EntityManager();
 			Chunks = new ChunkManager(Entities);
+			Output = output;
 		}
 		
 		[Fact]
@@ -25,11 +30,13 @@ namespace EntitySystem.Tests
 			
 			var block = Chunks.Get(pos);
 			Assert.Equal(block.Components.Count(), 1);
+			Assert.True(block.Has<Block>());
 			Assert.Equal(block.Get<Block>().Value.Position, pos);
 			
 			var chunk = Chunks.GetChunk(pos);
 			Assert.Equal(chunk.Components.Count(), 1);
 			Assert.True(chunk.Has<Chunk>());
+			Assert.Equal(chunk.Get<Chunk>().Value.Position, Chunks.GetChunkPos(pos));
 			
 			// Make sure there's no entities right now
 			Assert.Equal(Entities.Count(), 0);
@@ -46,17 +53,25 @@ namespace EntitySystem.Tests
 			Assert.Equal(Entities.Count(), 2);  // a new block entity
 			Assert.True(chunk.Has<ChunkBlockEntities>());
 			
-			Assert.Equal(block.Components.OrderBy(i => i),
+			Assert.Equal(block.Components.OrderBy(NameSelector),
 				new IComponent[] {
 					new Block(pos),
 					new TestChunkComponent(10),
 					new TestEntityComponent(10)
-				}.OrderBy(i => i));
+				}.OrderBy(NameSelector));
 		}
+		
+		String NameSelector(IComponent component) => component.GetType().Name;
 		
 		void TestSetBlockRefComponent<T>(BlockRef block, T component) where T : IComponent
 		{
+			Assert.False(block.Has<T>());
+			Assert.Equal(block.Get<T>(), Option<T>.None);
+			Assert.DoesNotContain(component, block.Components);
+			
 			block.Set(component);
+			
+			Assert.True(block.Has<T>());
 			Assert.Equal(block.Get<T>(), component);
 			Assert.Contains(component, block.Components);
 		}
