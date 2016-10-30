@@ -8,9 +8,9 @@ using EntitySystem.Utility;
 
 namespace EntitySystem
 {
-	public class EntityManager : IEnumerable<EntityManager.EntityRef>
+	public class EntityManager : IEnumerable<EntityRef>
 	{
-		readonly OptionDictionary<Entity, TypedCollection<IComponent>> _entities =
+		internal readonly OptionDictionary<Entity, TypedCollection<IComponent>> _entities =
 			new OptionDictionary<Entity, TypedCollection<IComponent>>();
 		
 		uint _entityIdCounter = 1;
@@ -51,7 +51,7 @@ namespace EntitySystem
 		
 		public void Remove(Entity entity) {
 			_entities.TryRemove(entity).Expect(
-				() => new EntityNonExistantException(entity));
+				() => new EntityNonExistantException(this, entity));
 			Removed?.Invoke(entity);
 		}
 		
@@ -62,56 +62,5 @@ namespace EntitySystem
 			_entities.Keys.Select((entity) => this[entity]).GetEnumerator();
 		
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-		
-		
-		public class EntityRef : IEntityRef
-		{
-			readonly EntityManager _manager;
-			readonly Entity _entity;
-			
-			public bool Exists => _manager._entities[_entity].HasValue;
-			
-			internal EntityRef(EntityManager manager, Entity entity)
-				{ _manager = manager; _entity = entity; }
-			
-			// IEntityRef implementation
-			
-			public Option<Entity> Entity => new Option<Entity>(_entity, Exists);
-			
-			public IEnumerable<IComponent> Components =>
-				_manager._entities[_entity]
-					.Map((components) => components.Select(x => x))
-					.Or(Enumerable.Empty<IComponent>());
-			
-			public bool Has<T>() where T : IComponent =>
-				Get<T>().HasValue;
-			
-			public Option<T> Get<T>() where T : IComponent =>
-				_manager._entities[_entity].Map((components) => components.TryGet<T>());
-			
-			public Option<T> Set<T>(Option<T> value) where T : IComponent =>
-				_manager._entities[_entity].Expect(
-						() => new EntityNonExistantException(_entity)
-					).Set(value);
-			
-			public Option<T> Remove<T>() where T : IComponent =>
-				Set(Option<T>.None);
-			
-			// ToString / Casting
-			
-			public override string ToString() =>
-				_entity.ToString().Replace(nameof(_entity), nameof(EntityRef));
-			
-			public static implicit operator Entity(
-				EntityRef entityRef) => entityRef._entity;
-		}
-		
-		public class EntityNonExistantException : Exception
-		{
-			public Entity Entity { get; private set; }
-			
-			public EntityNonExistantException(Entity entity)
-				: base($"{ entity } does not exist") { Entity = entity; }
-		}
 	}
 }
