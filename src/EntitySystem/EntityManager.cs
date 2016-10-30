@@ -21,13 +21,19 @@ namespace EntitySystem
 		public EntityRef this[Entity entity] => new EntityRef(this, entity);
 		
 		
+		public event Action<Entity> Added;
+		public event Action<Entity> Removed;
+		
+		
 		public EntityRef New()
 		{
 			var components = new TypedCollection<IComponent>();
 			while (true) {
 				var entity = new Entity(unchecked(_entityIdCounter++));
-				if (!_entities.TryAdd(entity, components).HasValue)
+				if (!_entities.TryAdd(entity, components).HasValue) {
+					Added?.Invoke(entity);
 					return new EntityRef(this, entity);
+				}
 			}
 		}
 		
@@ -43,9 +49,11 @@ namespace EntitySystem
 			return entity;
 		}
 		
-		public void Remove(Entity entity) =>
+		public void Remove(Entity entity) {
 			_entities.TryRemove(entity).Expect(
 				() => new EntityNonExistantException(entity));
+			Removed?.Invoke(entity);
+		}
 		
 		
 		// IEnumerable implementation
