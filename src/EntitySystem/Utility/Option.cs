@@ -35,6 +35,8 @@ namespace EntitySystem.Utility
 		
 		public T OrDefault() => Or(default(T));
 		
+		public bool TryGet(out T value) { value = OrDefault(); return HasValue; }
+		
 		
 		public Option<TResult> Map<TResult>(Func<T, TResult> func) =>
 			(HasValue ? Option<TResult>.Some(func(_value)) : Option<TResult>.None);
