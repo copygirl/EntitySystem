@@ -27,10 +27,10 @@ namespace EntitySystem.Utility
 			{ if (HasValue) throw func(); }
 		
 		
-		public T Or(T @default) => (HasValue ? Value : @default);
+		public T Or(T @default) => (HasValue ? _value : @default);
 		
-		public T Or(Func<T> func) => (HasValue ? Value : func());
-			
+		public T Or(Func<T> func) => (HasValue ? _value : func());
+		
 		public Option<T> Or(Func<Option<T>> func) => (HasValue ? this : func());
 		
 		public T OrDefault() => Or(default(T));
@@ -62,7 +62,7 @@ namespace EntitySystem.Utility
 			Equals(other, EqualityComparer<T>.Default);
 		public bool Equals(Option<T> other, IEqualityComparer<T> comparer) =>
 			((HasValue == other.HasValue) &&
-			 (!HasValue || comparer.Equals(_value, other.Value)));
+			 (!HasValue || comparer.Equals(_value, other._value)));
 		
 		public static bool operator ==(Option<T> left, Option<T> right) => left.Equals(right);
 		
