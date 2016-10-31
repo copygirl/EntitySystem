@@ -41,19 +41,25 @@ namespace EntitySystem
 			return _defaultMap.Get<T>(entity);
 		}
 		
-		public Option<T> Set<T>(Entity entity, Option<T> value) where T : IComponent
+		public Option<T> Set<T>(Entity entity, Option<T> valueOption) where T : IComponent
 		{
 			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
-			var previous = _defaultMap.Set<T>(entity, value);
-			if (value.HasValue) {
-				if (!previous.HasValue) {
-					OfType<T>().RaiseAdded(entity, value.Value);
-					Added?.Invoke(entity, value.Value);
+			
+			T value;
+			var hasValue = valueOption.TryGet(out value);
+			T previous;
+			var hasPrevious = _defaultMap.Set<T>(entity, valueOption).TryGet(out previous);
+			
+			if (hasValue) {
+				if (!hasPrevious) {
+					OfType<T>().RaiseAdded(entity, value);
+					Added?.Invoke(entity, value);
 				}
-			} else if (previous.HasValue) {
-				OfType<T>().RaiseRemoved(entity, previous.Value);
-				Removed?.Invoke(entity, previous.Value);
+			} else if (hasPrevious) {
+				OfType<T>().RaiseRemoved(entity, previous);
+				Removed?.Invoke(entity, previous);
 			}
+			
 			return previous;
 		}
 		
