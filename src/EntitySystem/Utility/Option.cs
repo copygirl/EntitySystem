@@ -7,7 +7,7 @@ namespace EntitySystem.Utility
 	{
 		readonly T _value;
 		
-		public bool HasValue { get; private set; }
+		public bool HasValue { get; }
 		
 		public T Value => Expect(() =>
 			new InvalidOperationException($"Option has no value"));
@@ -73,5 +73,25 @@ namespace EntitySystem.Utility
 		
 		public override string ToString() =>
 			$"{ GetType().GetFriendlyName() }.{ Map((value) => $"Some( { value.ToString()} )").Or("None") }";
+	}
+	
+	public static class OptionExtensions
+	{
+		public static IEnumerable<T> WhereSome<T>(this IEnumerable<Option<T>> source)
+		{
+			foreach (var option in ThrowIf.Argument.IsNull(source, nameof(source)))
+				if (option.HasValue)
+					yield return option.Value;
+		}
+		
+		public static IEnumerable<TResult> SelectSome<TSource, TResult>(
+			this IEnumerable<TSource> source, Func<TSource, Option<TResult>> selector)
+		{
+			foreach (var value in ThrowIf.Argument.IsNull(source, nameof(source))) {
+				var result = selector(value);
+				if (result.HasValue)
+					yield return result.Value;
+			}
+		}
 	}
 }
