@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using EntitySystem.Collections;
+using EntitySystem.Storage;
+using EntitySystem.Utility;
+
+namespace EntitySystem
+{
+	public class ComponentManager
+	{
+		readonly TypedCollection<object> _typeHandlers = new TypedCollection<object>();
+		readonly GenericComponentMap _defaultMap = new GenericComponentMap();
+		
+		public EntityManager Entities { get; }
+		
+		public event Action<Entity, IComponent> Added;
+		public event Action<Entity, IComponent> Removed;
+		
+		
+		internal ComponentManager(EntityManager entities)
+		{
+			Entities = entities;
+			Entities.Removed += _defaultMap.RemoveAll; // This might be slow..?
+		}
+		
+		
+		public ComponentsOfType<T> OfType<T>() where T : IComponent =>
+			_typeHandlers.GetOrAdd<ComponentsOfType<T>>(() => {
+				var type = typeof(T).GetTypeInfo();
+				if (type.IsInterface || type.IsAbstract)
+					throw new InvalidOperationException(
+						$"{ typeof(T) } is not a concrete component type");
+				return new ComponentsOfType<T>(this);
+			});
+		
+		
+		public Option<T> Get<T>(Entity entity) where T : IComponent
+		{
+			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
+			return _defaultMap.Get<T>(entity);
+		}
+		
+		public Option<T> Set<T>(Entity entity, Option<T> value) where T : IComponent
+		{
+			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
+			var previous = _defaultMap.Set<T>(entity, value);
+			if (value.HasValue) {
+				if (!previous.HasValue) {
+					OfType<T>().RaiseAdded(entity, value.Value);
+					Added?.Invoke(entity, value.Value);
+				}
+			} else if (previous.HasValue) {
+				OfType<T>().RaiseRemoved(entity, previous.Value);
+				Removed?.Invoke(entity, previous.Value);
+			}
+			return previous;
+		}
+		
+		public IEnumerable<IComponent> GetAll(Entity entity)
+		{
+			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
+			return _defaultMap.GetAll(entity);
+		}
+		
+		
+		public class ComponentsOfType<T> where T : IComponent
+		{
+			readonly ComponentManager _manager;
+			
+			public event Action<Entity, T> Added;
+			public event Action<Entity, T> Removed;
+			// Add Changed event? It's possible. Unsure if needed.
+			// Depends on how large the overhead for it would be.
+			// Can be overridden by using a custom storage handler in the future.
+			
+			public IEnumerable<Tuple<Entity, T>> Entries =>
+				_manager._defaultMap.Entities<T>();
+			
+			internal ComponentsOfType(ComponentManager manager) { _manager = manager; }
+			
+			internal void RaiseAdded(Entity entity, T component) => Added?.Invoke(entity, component);
+			internal void RaiseRemoved(Entity entity, T component) => Removed?.Invoke(entity, component);
+		}
+	}
+}

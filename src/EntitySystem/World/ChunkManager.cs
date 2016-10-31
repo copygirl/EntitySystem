@@ -7,13 +7,13 @@ namespace EntitySystem.World
 {
 	public class ChunkManager
 	{
-		public EntityManager EntityManager { get; }
+		public EntityManager Entities { get; }
 		public StorageRegistry Storage { get; }
 		
-		public ChunkManager(EntityManager entityManager)
+		public ChunkManager(EntityManager entities)
 		{
-			EntityManager = ThrowIf.Argument.IsNull(entityManager, nameof(entityManager));
-			Storage       = new StorageRegistry(this);
+			Entities = ThrowIf.Argument.IsNull(entities, nameof(entities));
+			Storage  = new StorageRegistry(this);
 		}
 		
 		
@@ -33,7 +33,7 @@ namespace EntitySystem.World
 		public Entity GetOrCreateChunkEntity(BlockPos pos) =>
 			GetOrCreateChunkEntity(GetChunkPos(pos));
 		public Entity GetOrCreateChunkEntity(ChunkPos pos) =>
-			_chunks.GetOrAdd(pos, (_) => EntityManager.New(new Chunk(pos)));
+			_chunks.GetOrAdd(pos, (_) => Entities.New(new Chunk(pos)));
 		
 		
 		public ChunkPos GetChunkPos(BlockPos pos) =>
@@ -56,7 +56,7 @@ namespace EntitySystem.World
 			
 			public void Register<T>() where T : struct, IComponent =>
 				_storageRegistry.Add(typeof(T),
-					new StorageHandler<T>(typeof(T), _chunks.EntityManager));
+					new StorageHandler<T>(typeof(T), _chunks.Entities));
 			
 			public Option<StorageHandler<T>> Get<T>() where T : IComponent =>
 				Get(typeof(T)).Cast<StorageHandler<T>>();

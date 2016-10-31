@@ -8,17 +8,17 @@ namespace EntitySystem.World
 {
 	public class BlockRef : IEntityRef
 	{
-		public ChunkManager ChunkManager { get; }
+		public ChunkManager Chunks { get; }
 		public BlockPos Position { get; }
 		
-		public EntityManager EntityManager => ChunkManager.EntityManager;
-		public ChunkRef Chunk => ChunkManager.GetChunk(Position);
-		public BlockPos ChunkRelPos => ChunkManager.GetChunkRelPos(Position);
+		public EntityManager Entities => Chunks.Entities;
+		public ChunkRef Chunk => Chunks.GetChunk(Position);
+		public BlockPos ChunkRelPos => Chunks.GetChunkRelPos(Position);
 		
-		internal BlockRef(ChunkManager chunkManager, BlockPos pos)
+		internal BlockRef(ChunkManager chunks, BlockPos pos)
 		{
-			ChunkManager = ThrowIf.Argument.IsNull(chunkManager, nameof(chunkManager));;
-			Position     = pos;
+			Chunks   = ThrowIf.Argument.IsNull(chunks, nameof(chunks));;
+			Position = pos;
 		}
 		
 		
@@ -29,7 +29,7 @@ namespace EntitySystem.World
 		
 		Entity GetOrCreateEntity() =>
 			Chunk.GetOrAdd(() => new ChunkBlockEntities())
-				.GetOrAdd(ChunkRelPos, () => EntityManager.New(new Block(Position)));
+				.GetOrAdd(ChunkRelPos, () => Entities.New(new Block(Position)));
 		
 		
 		// IEntityRef implementation
@@ -39,18 +39,13 @@ namespace EntitySystem.World
 				entities.Get(ChunkRelPos));
 		
 		public IEnumerable<IComponent> Components =>
-			Entity.Map((block) => EntityManager[block].Components)
+			Entity.Map((block) => Entities[block].Components)
 				.Or(() => new IComponent[]{ new Block(Position) }.AsEnumerable())
 				.Concat(GetBlockStorageComponents());
 		
-		public bool Has<T>() where T : IComponent =>
-			(typeof(T) == typeof(Block)) ||
-				Entity.Map((block) => EntityManager[block].Has<T>())
-					.Or(() => Chunk.Has<ChunkBlockStorage<T>>());
-		
 		public Option<T> Get<T>() where T : IComponent =>
 			(typeof(T) == typeof(Block)) ? (T)(object)new Block(Position) :
-				Entity.Map((block) => EntityManager[block].Get<T>())
+				Entity.Map((block) => Entities[block].Get<T>())
 					.Or(() => Chunk.Get<ChunkBlockStorage<T>>()
 						.Map((storage) => storage.Get(ChunkRelPos)));
 		
@@ -58,27 +53,18 @@ namespace EntitySystem.World
 		{
 			if (typeof(T) == typeof(Block)) throw new InvalidOperationException(
 				$"{ nameof(Block) } cannot be modified");
-			var handler = ChunkManager.Storage.Get<T>();
+			var handler = Chunks.Storage.Get<T>();
 			return (handler.HasValue
 				? (value.HasValue
 					? handler.Value
-						.GetOrAdd(ChunkManager.GetOrCreateChunkEntity(Position))
+						.GetOrAdd(Chunks.GetOrCreateChunkEntity(Position))
 						.Set(ChunkRelPos, value)
-					: ChunkManager.GetChunkEntity(Position)
+					: Chunks.GetChunkEntity(Position)
 						.Map((chunk) => handler.Value.Get(chunk))
 						.Map((storage) => storage.Remove(ChunkRelPos)))
 				: (value.HasValue
-					? EntityManager[GetOrCreateEntity()].Set(value)
-					: Entity.Map((block) => EntityManager[block].Set(value))));
-		}
-		
-		public Option<T> Remove<T>() where T : IComponent
-		{
-			if (typeof(T) == typeof(Block)) throw new InvalidOperationException(
-				$"{ nameof(Block) } cannot be modified");
-			return Entity.Map((block) => EntityManager[block].Remove<T>())
-				.Or(() => Chunk.Get<ChunkBlockStorage<T>>()
-					.Map((storage) => storage.Remove(ChunkRelPos)));
+					? Entities[GetOrCreateEntity()].Set(value)
+					: Entity.Map((block) => Entities[block].Set(value))));
 		}
 		
 		
