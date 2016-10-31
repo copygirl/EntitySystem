@@ -74,7 +74,7 @@ namespace EntitySystem.Utility
 			(HasValue ? (_value?.GetHashCode() ?? 0) : 0);
 		
 		public override string ToString() =>
-			$"{ GetType().GetFriendlyName() }.{ Map((value) => $"Some( { value.ToString()} )").Or("None") }";
+			$"{ GetType().GetFriendlyName() }.{ Map((value) => $"Some( { value } )").Or("None") }";
 	}
 	
 	public static class OptionExtensions
