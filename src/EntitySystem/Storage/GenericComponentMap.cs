@@ -23,7 +23,7 @@ namespace EntitySystem.Storage
 				.Set(entity, value);
 		
 		
-		public IEnumerable<Tuple<Entity, T>> Entities<T>() where T : IComponent =>
+		public IEnumerable<Tuple<Entity, T>> Entries<T>() where T : IComponent =>
 			_dict[typeof(T)]
 				.Cast<EntityComponentMap<T>>()
 				.Map((map) => map.Select((entry) => Tuple.Create(entry.Key, entry.Value)))

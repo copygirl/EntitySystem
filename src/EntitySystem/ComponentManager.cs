@@ -75,7 +75,7 @@ namespace EntitySystem
 			// Can be overridden by using a custom storage handler in the future.
 			
 			public IEnumerable<Tuple<Entity, T>> Entries =>
-				_manager._defaultMap.Entities<T>();
+				_manager._defaultMap.Entries<T>();
 			
 			internal ComponentsOfType(ComponentManager manager) { _manager = manager; }
 			
