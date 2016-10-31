@@ -49,22 +49,33 @@ namespace EntitySystem.World
 					.Or(() => Chunk.Get<ChunkBlockStorage<T>>()
 						.Map((storage) => storage.Get(ChunkRelPos)));
 		
-		public Option<T> Set<T>(Option<T> value) where T : IComponent
+		public Option<T> Set<T>(Option<T> valueOption) where T : IComponent
 		{
 			if (typeof(T) == typeof(Block)) throw new InvalidOperationException(
 				$"{ nameof(Block) } cannot be modified");
-			var handler = Chunks.Storage.Get<T>();
-			return (handler.HasValue
-				? (value.HasValue
-					? handler.Value
+			
+			T value;
+			var hasValue = valueOption.TryGet(out value);
+			
+			ChunkManager.StorageHandler<T> handler;
+			return ((Chunks.Storage.Get<T>().TryGet(out handler))
+				// If a storage handler was registered for this component type,
+				// the value will be stored in a chunk's block storage component.
+				? ((hasValue && !EqualityComparer<T>.Default.Equals(default(T), value))
+					// Block storage stores unset values as defaults, hence the additional check.
+					// If the value is being set (and not default), create a new chunk and block storage if needed.
+					? handler
 						.GetOrAdd(Chunks.GetOrCreateChunkEntity(Position))
 						.Set(ChunkRelPos, value)
+					// If the value is being unset, remove (internally, set to default)
+					// the component, if the chunk and block storage component exist.
 					: Chunks.GetChunkEntity(Position)
-						.Map((chunk) => handler.Value.Get(chunk))
+						.Map((chunk) => handler.Get(chunk))
 						.Map((storage) => storage.Remove(ChunkRelPos)))
-				: (value.HasValue
-					? Entities[GetOrCreateEntity()].Set(value)
-					: Entity.Map((block) => Entities[block].Set(value))));
+				// No storage handler means components are stored on a block entity.
+				: (hasValue
+					? Entities[GetOrCreateEntity()].Set(valueOption)
+					: Entity.Map((block) => Entities[block].Remove<T>())));
 		}
 		
 		
