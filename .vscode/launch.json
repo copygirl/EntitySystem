@@ -4,9 +4,9 @@
 		"name": "EntitySystem.Playground",
 		"type": "coreclr",
 		"request": "launch",
-		"preLaunchTask": "build",
+		"preLaunchTask": "buildPlayground",
 		"program": "${workspaceRoot}/test/EntitySystem.Playground/bin/Debug/netcoreapp1.0/EntitySystem.Playground.dll",
-		"args": [],
+		"args": [  ],
 		"cwd": "${workspaceRoot}",
 		"stopAtEntry": false,
 		"externalConsole": false

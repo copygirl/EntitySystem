@@ -2,17 +2,23 @@
 	"version": "0.1.0",
 	"command": "dotnet",
 	"isShellCommand": true,
-	"args": [ ],
+	"args": [  ],
 	"tasks": [{
 		"taskName": "build",
-		"args": [ "**/project.json" ],
+		"args": [ "src/**/project.json" ],
 		"isBuildCommand": true,
+		"showOutput": "always",
+		"problemMatcher": "$msCompile"
+	}, {
+		"taskName": "buildPlayground",
+		"suppressTaskName": true,
+		"args": [ "build", "test/EntitySystem.Playground/project.json" ],
 		"showOutput": "always",
 		"problemMatcher": "$msCompile"
 	}, {
 		"taskName": "test",
 		"args": [ "test/EntitySystem.Tests/project.json" ],
-		"isBuildCommand": true,
+		"isTestCommand": true,
 		"showOutput": "always",
 		"problemMatcher": "$msCompile"
 	}]
