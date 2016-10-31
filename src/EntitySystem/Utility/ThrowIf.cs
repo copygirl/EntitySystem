@@ -60,6 +60,15 @@ namespace EntitySystem.Utility
 					$"{ paramName } is empty, at least one { nameof(T) } is required", paramName);
 				return array;
 			}
+			
+			public static T[] ContainsNull<T>(T[] array, string paramName)
+			{
+				ThrowIf.Argument.IsNull(array, paramName);
+				foreach (var element in array)
+					if (element == null) throw new ArgumentException(
+						$"{ paramName } contains some null elements", paramName);
+				return array;
+			}
 		}
 	}
 }
