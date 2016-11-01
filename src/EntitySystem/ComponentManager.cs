@@ -45,10 +45,9 @@ namespace EntitySystem
 		{
 			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
 			
-			T value;
-			var hasValue = valueOption.TryGet(out value);
-			T previous;
-			var hasPrevious = _defaultMap.Set<T>(entity, valueOption).TryGet(out previous);
+			var previousOption = _defaultMap.Set<T>(entity, valueOption);
+			T value; var hasValue = valueOption.TryGet(out value);
+			T previous; var hasPrevious = previousOption.TryGet(out previous);
 			
 			if (hasValue) {
 				if (!hasPrevious) {
@@ -60,7 +59,7 @@ namespace EntitySystem
 				Removed?.Invoke(entity, previous);
 			}
 			
-			return previous;
+			return previousOption;
 		}
 		
 		public IEnumerable<IComponent> GetAll(Entity entity)
