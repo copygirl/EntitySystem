@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using EntitySystem.Collections;
+using EntitySystem.Components;
 using EntitySystem.Storage;
 using EntitySystem.Utility;
 
@@ -38,7 +40,11 @@ namespace EntitySystem
 		public Option<T> Get<T>(Entity entity) where T : IComponent
 		{
 			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
-			return _defaultMap.Get<T>(entity);
+			return _defaultMap.Get<T>(entity).Or(() =>
+				(typeof(T) != typeof(Prototype))
+					? _defaultMap.Get<Prototype>(entity)
+						.Map((prototype) => Get<T>(prototype))
+					: Option<T>.None);
 		}
 		
 		public Option<T> Set<T>(Entity entity, Option<T> valueOption) where T : IComponent
@@ -65,7 +71,10 @@ namespace EntitySystem
 		public IEnumerable<IComponent> GetAll(Entity entity)
 		{
 			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
-			return _defaultMap.GetAll(entity);
+			return _defaultMap.GetAll(entity).Concat(
+				_defaultMap.Get<Prototype>(entity)
+					.Map((prototype) => GetAll(prototype))
+					.Or(Enumerable.Empty<IComponent>()));
 		}
 		
 		

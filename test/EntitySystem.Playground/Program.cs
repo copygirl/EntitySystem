@@ -1,4 +1,5 @@
 ﻿using System;
+using EntitySystem.Components;
 using EntitySystem.Components.World;
 using EntitySystem.Utility;
 using EntitySystem.World;
@@ -18,17 +19,17 @@ namespace EntitySystem.Playground
 			var chunkPos    = chunks.GetChunkPos(pos);
 			var chunkRelPos = chunks.GetChunkRelPos(pos);
 			
+			var prototype = entities.New(
+				new GenericTest<byte>(),
+				new GenericTest<short>(),
+				new GenericTest<int>());
+			
 			var block = chunks.Get(pos);
 			var chunk = chunks.GetChunk(chunkPos);
 			block.Set(new BlockTest(10));
 			
-			block.Set(new GenericTest<byte>());
-			block.Set(new GenericTest<short>());
-			block.Set(new GenericTest<int>());
-			
-			chunk.Set(new GenericTest<byte>());
-			chunk.Set(new GenericTest<short>());
-			chunk.Set(new GenericTest<int>());
+			block.Set(new Prototype(prototype));
+			chunk.Set(new Prototype(prototype));
 			
 			Console.WriteLine($"Chunk: { string.Join(", ", chunk.Components) }");
 			Console.WriteLine($"Block: { string.Join(", ", block.Components) }");
