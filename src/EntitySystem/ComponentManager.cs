@@ -88,7 +88,7 @@ namespace EntitySystem
 			// Depends on how large the overhead for it would be.
 			// Can be overridden by using a custom storage handler in the future.
 			
-			public IEnumerable<Tuple<Entity, T>> Entries =>
+			public IEnumerable<EntityComponentEntry<T>> Entries =>
 				_manager._defaultMap.Entries<T>();
 			
 			internal ComponentsOfType(ComponentManager manager) { _manager = manager; }

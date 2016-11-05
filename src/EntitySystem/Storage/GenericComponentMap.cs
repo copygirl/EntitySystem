@@ -23,11 +23,12 @@ namespace EntitySystem.Storage
 				.Set(entity, value);
 		
 		
-		public IEnumerable<Tuple<Entity, T>> Entries<T>() where T : IComponent =>
+		public IEnumerable<EntityComponentEntry<T>> Entries<T>() where T : IComponent =>
 			_dict[typeof(T)]
 				.Cast<EntityComponentMap<T>>()
-				.Map((map) => map.Select((entry) => Tuple.Create(entry.Key, entry.Value)))
-				.Or(Enumerable.Empty<Tuple<Entity, T>>());
+				.Map((map) => map.Select((entry) =>
+					new EntityComponentEntry<T>(entry.Key, entry.Value)))
+				.Or(Enumerable.Empty<EntityComponentEntry<T>>());
 		
 		
 		public IEnumerable<IComponent> GetAll(Entity entity) =>
