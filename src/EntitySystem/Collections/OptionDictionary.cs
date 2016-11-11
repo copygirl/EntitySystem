@@ -69,11 +69,8 @@ namespace EntitySystem.Collections
 		
 		public OptionDictionary(IDictionary<TKey, TValue> dict) : this(dict, null) {  }
 		public OptionDictionary(IDictionary<TKey, TValue> dict, IEqualityComparer<TKey> comparer)
-			: this(dict?.Count ?? 0, comparer)
-		{
-			ThrowIf.Argument.IsNull(dict, nameof(dict));
-			foreach (var entry in dict) Add(entry.Key, entry.Value);
-		}
+			: this(ThrowIf.Argument.IsNull(dict, nameof(dict)).Count, comparer)
+			{ foreach (var entry in dict) Add(entry.Key, entry.Value); }
 		
 		
 		// Getters
