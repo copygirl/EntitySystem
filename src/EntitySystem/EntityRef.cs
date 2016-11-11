@@ -22,13 +22,13 @@ namespace EntitySystem
 		public Option<Entity> Entity => new Option<Entity>(_entity, Exists);
 		
 		public IEnumerable<IComponent> Components =>
-			_manager.Components.GetAll(_entity);
+			_manager.Components.GetAll(Entity.Expect(() => new EntityNonExistantException(_manager, _entity)));
 		
 		public Option<T> Get<T>() where T : IComponent =>
-			_manager.Components.Get<T>(_entity);
+			_manager.Components.Get<T>(Entity.Expect(() => new EntityNonExistantException(_manager, _entity)));
 		
 		public Option<T> Set<T>(Option<T> value) where T : IComponent =>
-			_manager.Components.Set<T>(_entity, value);
+			_manager.Components.Set<T>(Entity.Expect(() => new EntityNonExistantException(_manager, _entity)), value);
 		
 		// ToString / Casting
 		

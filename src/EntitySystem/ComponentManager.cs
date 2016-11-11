@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using EntitySystem.Collections;
 using EntitySystem.Components;
@@ -11,90 +10,185 @@ namespace EntitySystem
 {
 	public class ComponentManager
 	{
-		readonly TypedCollection<object> _typeHandlers = new TypedCollection<object>();
-		readonly GenericComponentMap _defaultMap = new GenericComponentMap();
+		readonly OptionDictionary<Type, IComponentMap> _handlers =
+			new OptionDictionary<Type, IComponentMap>();
 		
 		public EntityManager Entities { get; }
 		
-		public event Action<Entity, IComponent> Added;
-		public event Action<Entity, IComponent> Removed;
+		public delegate void ComponentAdded<T>(Entity entity, T value) where T : IComponent;
+		public delegate void ComponentRemoved<T>(Entity entity, T previous) where T : IComponent;
+		public delegate void ComponentChanged<T>(Entity entity, Option<T> previous, Option<T> current) where T : IComponent;
+		
+		public event ComponentAdded<IComponent> Added;
+		public event ComponentRemoved<IComponent> Removed;
+		public event ComponentChanged<IComponent> Changed;
 		
 		
 		internal ComponentManager(EntityManager entities)
 		{
 			Entities = entities;
-			Entities.Removed += _defaultMap.RemoveAll; // This might be slow..?
+			
+			Entities.Removed += (entity) => {
+				foreach (var handler in _handlers.Values)
+					handler.TryRemove(entity);
+			};
+			
+			OfType<Prototype>().Changed += (entity, previousOption, currentOption) => {
+				Prototype previous; if (previousOption.TryGet(out previous)) {
+					PrototypeDerived derivatives;
+					if (Get<PrototypeDerived>(previous).TryGet(out derivatives))
+						derivatives.Remove(entity);
+				}
+				Prototype current; if (currentOption.TryGet(out current))
+					GetOrAdd(current, () => new PrototypeDerived()).Add(entity);
+			};
 		}
 		
 		
-		public ComponentsOfType<T> OfType<T>() where T : IComponent =>
-			_typeHandlers.GetOrAdd<ComponentsOfType<T>>(() => {
-				var type = typeof(T).GetTypeInfo();
-				if (type.IsInterface || type.IsAbstract)
+		ComponentHandler<T> GetHandler<T>() where T : IComponent =>
+			(ComponentHandler<T>)_handlers.GetOrAdd(typeof(T), (type) => {
+				var info = typeof(T).GetTypeInfo();
+				if (info.IsInterface || info.IsAbstract)
 					throw new InvalidOperationException(
 						$"{ typeof(T) } is not a concrete component type");
-				return new ComponentsOfType<T>(this);
+				return new ComponentHandler<T>(this);
 			});
 		
+		public IComponentsOfType<T> OfType<T>() where T : IComponent =>
+			(IComponentsOfType<T>)GetHandler<T>();
 		
-		public Option<T> Get<T>(Entity entity) where T : IComponent
-		{
-			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
-			return _defaultMap.Get<T>(entity).Or(() =>
+		
+		public Option<T> GetPersonal<T>(Entity entity) where T : IComponent =>
+			GetHandler<T>().TryGet(entity);
+		
+		public Option<T> Get<T>(Entity entity) where T : IComponent =>
+			GetPersonal<T>(entity).Or(() =>
 				(typeof(T) != typeof(Prototype))
-					? _defaultMap.Get<Prototype>(entity)
+					? GetPersonal<Prototype>(entity)
 						.Map((prototype) => Get<T>(prototype))
 					: Option<T>.None);
+		
+		public T GetOrAdd<T>(Entity entity, Func<T> defaultFactory) where T : IComponent =>
+			Get<T>(entity).Or(() => {
+				var value = defaultFactory();
+				Set<T>(entity, value);
+				return value;
+			});
+		
+		public IEnumerable<IComponent> GetAll(Entity entity)
+		{
+			// TODO: Handle prototype values.
+			return _handlers.Values.SelectSome((map) => map.TryGet(entity));
 		}
 		
-		public Option<T> Set<T>(Entity entity, Option<T> valueOption) where T : IComponent
+		public Option<T> Set<T>(Entity entity, Option<T> value) where T : IComponent
 		{
-			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
-			
-			var previousOption = _defaultMap.Set<T>(entity, valueOption);
-			T value; var hasValue = valueOption.TryGet(out value);
+			var handler = GetHandler<T>();
+			var previous = handler.Set(entity, value);
+			RaiseChanged(handler, entity, previous, value);
+			return previous;
+		}
+		
+		
+		void RaiseChanged<T>(ComponentHandler<T> handler, Entity entity,
+		                     Option<T> previousOption, Option<T> currentOption) where T : IComponent
+		{
+			T current; var hasValue = currentOption.TryGet(out current);
 			T previous; var hasPrevious = previousOption.TryGet(out previous);
 			
 			if (hasValue) {
 				if (!hasPrevious) {
-					OfType<T>().RaiseAdded(entity, value);
-					Added?.Invoke(entity, value);
+					handler.RaiseAdded(entity, current);
+					Added?.Invoke(entity, current);
 				}
 			} else if (hasPrevious) {
-				OfType<T>().RaiseRemoved(entity, previous);
+				handler.RaiseRemoved(entity, previous);
 				Removed?.Invoke(entity, previous);
 			}
 			
-			return previousOption;
+			handler.RaiseChanged(entity, previousOption, currentOption);
+			Changed?.Invoke(entity, previousOption.Cast<IComponent>(), currentOption.Cast<IComponent>());
 		}
 		
-		public IEnumerable<IComponent> GetAll(Entity entity)
+		
+		public interface IComponentsOfType<T> where T : IComponent
 		{
-			if (!Entities.Has(entity)) throw new EntityNonExistantException(Entities, entity);
-			return _defaultMap.GetAll(entity).Concat(
-				_defaultMap.Get<Prototype>(entity)
-					.Map((prototype) => GetAll(prototype))
-					.Or(Enumerable.Empty<IComponent>()));
+			event ComponentAdded<T> Added;
+			event ComponentRemoved<T> Removed;
+			event ComponentChanged<T> Changed;
+			
+			IEnumerable<EntityComponentEntry<T>> GetEntries(LookupMode mode = LookupMode.Concrete);
+		}
+		
+		public enum LookupMode
+		{
+			Personal,
+			Concrete,
+			All
 		}
 		
 		
-		public class ComponentsOfType<T> where T : IComponent
+		interface IComponentMap
+		{
+			Option<IComponent> TryGet(Entity entity);
+			
+			void TryRemove(Entity entity);
+		}
+		
+		class ComponentHandler<T> : OptionDictionary<Entity, T>,
+		                            IComponentMap, IComponentsOfType<T>
+			where T : IComponent
 		{
 			readonly ComponentManager _manager;
 			
-			public event Action<Entity, T> Added;
-			public event Action<Entity, T> Removed;
-			// Add Changed event? It's possible. Unsure if needed.
-			// Depends on how large the overhead for it would be.
-			// Can be overridden by using a custom storage handler in the future.
+			internal ComponentHandler(ComponentManager manager) { _manager = manager; }
 			
-			public IEnumerable<EntityComponentEntry<T>> Entries =>
-				_manager._defaultMap.Entries<T>();
+			internal void RaiseAdded(Entity entity, T value) =>
+				Added?.Invoke(entity, value);
+			internal void RaiseRemoved(Entity entity, T previous) =>
+				Removed?.Invoke(entity, previous);
+			internal void RaiseChanged(Entity entity, Option<T> previous, Option<T> current) =>
+				Changed?.Invoke(entity, previous, current);
 			
-			internal ComponentsOfType(ComponentManager manager) { _manager = manager; }
+			// IComponentsOfType implementation
 			
-			internal void RaiseAdded(Entity entity, T component) => Added?.Invoke(entity, component);
-			internal void RaiseRemoved(Entity entity, T component) => Removed?.Invoke(entity, component);
+			public event ComponentAdded<T> Added;
+			public event ComponentRemoved<T> Removed;
+			public event ComponentChanged<T> Changed;
+			
+			public IEnumerable<EntityComponentEntry<T>> GetEntries(LookupMode mode = LookupMode.Concrete)
+			{
+				foreach (var entry in this) {
+					if (mode == LookupMode.Personal)
+						yield return new EntityComponentEntry<T>(entry.Key, entry.Value);
+					else foreach (var e in GetEntries(entry.Key, entry.Value, (mode == LookupMode.All)))
+						yield return e;
+				}
+			}
+			
+			IEnumerable<EntityComponentEntry<T>> GetEntries(Entity entity, T value, bool yieldPrototypes)
+			{
+				PrototypeDerived derivatives = _manager.GetPersonal<PrototypeDerived>(entity).OrDefault();
+				if ((derivatives == null) || yieldPrototypes)
+					yield return new EntityComponentEntry<T>(entity, value);
+				if (derivatives != null)
+					foreach (var derivedEntity in derivatives)
+						if (!ContainsKey(derivedEntity))
+							foreach (var entry in GetEntries(derivedEntity, value, yieldPrototypes))
+								yield return entry;
+			}
+			
+			// IComponentMap implementation
+			
+			Option<IComponent> IComponentMap.TryGet(Entity entity) =>
+				base.TryGet(entity).Cast<IComponent>();
+			
+			void IComponentMap.TryRemove(Entity entity)
+			{
+				Option<T> previous = base.TryRemove(entity);
+				if (previous.HasValue)
+					_manager.RaiseChanged(this, entity, previous, Option<T>.None);
+			}
 		}
 	}
 }
