@@ -58,10 +58,10 @@ namespace EntitySystem.World
 			var hasValue = valueOption.TryGet(out value);
 			
 			ChunkManager.StorageHandler<T> handler;
-			return ((Chunks.Storage.Get<T>().TryGet(out handler))
+			return Chunks.Storage.Get<T>().TryGet(out handler)
 				// If a storage handler was registered for this component type,
 				// the value will be stored in a chunk's block storage component.
-				? ((hasValue && !EqualityComparer<T>.Default.Equals(default(T), value))
+				? (hasValue && !EqualityComparer<T>.Default.Equals(default(T), value))
 					// Block storage stores unset values as defaults, hence the additional check.
 					// If the value is being set (and not default), create a new chunk and block storage if needed.
 					? handler
@@ -71,11 +71,11 @@ namespace EntitySystem.World
 					// the component, if the chunk and block storage component exist.
 					: Chunks.GetChunkEntity(Position)
 						.Map((chunk) => handler.Get(chunk))
-						.Map((storage) => storage.Remove(ChunkRelPos)))
+						.Map((storage) => storage.Remove(ChunkRelPos))
 				// No storage handler means components are stored on a block entity.
-				: (hasValue
+				: hasValue
 					? Entities[GetOrCreateEntity()].Set(valueOption)
-					: Entity.Map((block) => Entities[block].Remove<T>())));
+					: Entity.Map((block) => Entities[block].Remove<T>());
 		}
 		
 		
