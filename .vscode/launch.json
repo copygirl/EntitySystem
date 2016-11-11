@@ -9,6 +9,6 @@
 		"args": [  ],
 		"cwd": "${workspaceRoot}",
 		"stopAtEntry": false,
-		"externalConsole": false
+		"externalConsole": true
 	}]
 }
