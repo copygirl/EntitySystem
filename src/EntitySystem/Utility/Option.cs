@@ -60,15 +60,24 @@ namespace EntitySystem.Utility
 		
 		public override bool Equals(object obj) =>
 			((obj is Option<T>) && Equals((Option<T>)obj));
+		
 		public bool Equals(Option<T> other) =>
 			Equals(other, EqualityComparer<T>.Default);
 		public bool Equals(Option<T> other, IEqualityComparer<T> comparer) =>
-			((HasValue == other.HasValue) &&
-			 (!HasValue || comparer.Equals(_value, other._value)));
+			(other.HasValue ? Equals(other._value, comparer) : !HasValue);
 		
 		public static bool operator ==(Option<T> left, Option<T> right) => left.Equals(right);
-		
 		public static bool operator !=(Option<T> left, Option<T> right) => !left.Equals(right);
+		
+		public bool Equals(T value) =>
+			Equals(value, EqualityComparer<T>.Default);
+		public bool Equals(T value, IEqualityComparer<T> comparer) =>
+			(HasValue && comparer.Equals(_value, value));
+		
+		public static bool operator ==(Option<T> left, T right) => left.Equals(right);
+		public static bool operator !=(Option<T> left, T right) => !left.Equals(right);
+		public static bool operator ==(T left, Option<T> right) => right.Equals(left);
+		public static bool operator !=(T left, Option<T> right) => !right.Equals(left);
 		
 		public override int GetHashCode() =>
 			(HasValue ? (_value?.GetHashCode() ?? 0) : 0);
