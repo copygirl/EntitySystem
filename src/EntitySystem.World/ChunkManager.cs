@@ -1,7 +1,7 @@
 using System;
 using EntitySystem.Collections;
-using EntitySystem.Components.World;
 using EntitySystem.Utility;
+using EntitySystem.World.Components;
 
 namespace EntitySystem.World
 {

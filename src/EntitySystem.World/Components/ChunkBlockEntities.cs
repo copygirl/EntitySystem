@@ -5,7 +5,7 @@ using EntitySystem.Collections;
 using EntitySystem.Utility;
 using EntitySystem.World;
 
-namespace EntitySystem.Components.World
+namespace EntitySystem.World.Components
 {
 	public class ChunkBlockEntities : IComponent, IReadOnlyCollection<Entity>
 	{

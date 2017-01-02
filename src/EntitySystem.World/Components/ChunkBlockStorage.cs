@@ -4,7 +4,7 @@ using System.Reflection;
 using EntitySystem.Utility;
 using EntitySystem.World;
 
-namespace EntitySystem.Components.World
+namespace EntitySystem.World.Components
 {
 	public interface IChunkBlockStorage
 	{

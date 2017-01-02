@@ -1,7 +1,7 @@
 using System;
 using EntitySystem.World;
 
-namespace EntitySystem.Components.World
+namespace EntitySystem.World.Components
 {
 	public struct Chunk : IComponent, IEquatable<Chunk>
 	{

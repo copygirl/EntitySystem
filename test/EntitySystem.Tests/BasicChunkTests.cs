@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using EntitySystem.Components.World;
 using EntitySystem.Utility;
 using EntitySystem.World;
+using EntitySystem.World.Components;
 using Xunit;
 using Xunit.Abstractions;
 

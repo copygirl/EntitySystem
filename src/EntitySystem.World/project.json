@@ -1,5 +1,5 @@
 {
-	"name": "EntitySystem",
+	"name": "EntitySystem.World",
 	"version": "0.0.1-*",
 	"description": "",
 	"authors": [ "copygirl" ],
@@ -8,7 +8,9 @@
 		"debugType": "portable"
 	},
 	
-	"dependencies": { },
+	"dependencies": {
+		"EntitySystem": { "target": "project" }
+	},
 	
 	"frameworks": {
 		"netstandard1.6": {
