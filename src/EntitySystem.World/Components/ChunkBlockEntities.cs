@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using EntitySystem.Collections;
 using EntitySystem.Utility;
-using EntitySystem.World;
 
 namespace EntitySystem.World.Components
 {

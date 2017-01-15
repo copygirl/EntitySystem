@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using EntitySystem.Utility;
-using EntitySystem.World;
 
 namespace EntitySystem.World.Components
 {
