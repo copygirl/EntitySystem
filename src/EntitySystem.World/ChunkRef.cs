@@ -29,8 +29,9 @@ namespace EntitySystem.World
 				.Or(() => new IComponent[]{ new Chunk(Position) }.AsEnumerable());
 		
 		public Option<T> Get<T>() where T : IComponent =>
-			(typeof(T) == typeof(Chunk)) ? (T)(object)new Chunk(Position) :
-				Entity.Map((chunk) => Entities[chunk].Get<T>());
+			(typeof(T) == typeof(Chunk))
+				? Option<Chunk>.Some(new Chunk(Position)).Cast<T>()
+				: Entity.Map((chunk) => Entities[chunk].Get<T>());
 		
 		public Option<T> Set<T>(Option<T> value) where T : IComponent
 		{

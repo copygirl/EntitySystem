@@ -72,7 +72,7 @@ namespace EntitySystem.Tests
 			block.Set(component);
 			
 			Assert.True(block.Has<T>());
-			Assert.Equal(block.Get<T>(), component);
+			Assert.Equal(block.Get<T>().Value, component);
 			Assert.Contains(component, block.Components);
 		}
 		

@@ -81,7 +81,8 @@ namespace EntitySystem.Collections
 		{
 			bool found; int previous, bucket;
 			var index = FindEntry(key, false, out found, out previous, out bucket);
-			return (found ? _entries[index].Value : Option<TValue>.None);
+			return (found ? Option<TValue>.Some(_entries[index].Value)
+			              : Option<TValue>.None);
 		}
 		
 		public bool ContainsKey(TKey key) =>
@@ -131,7 +132,7 @@ namespace EntitySystem.Collections
 				
 				result = new Option<TValue>(_entries[index].Value, found);
 				if (found && abortOnExists) return result;
-				_entries[index].Value = (TValue)value;
+				_entries[index].Value = value.Value;
 				
 				// If the key was already present, version wasn't increased yet.
 				if (found) _version++;
@@ -139,7 +140,7 @@ namespace EntitySystem.Collections
 			} else if (found) {
 				// Removing an existing entry.
 				
-				result = _entries[index].Value;
+				result = Option<TValue>.Some(_entries[index].Value);
 				if (previous < 0) _buckets[bucket] = _entries[index].Next;
 				else _entries[previous].Next = _entries[index].Next;
 				

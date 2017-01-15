@@ -40,8 +40,7 @@ namespace EntitySystem
 		
 		
 		/// <summary> Sets the component of type <typeparam name="T">
-		///           of this entity, returning the previous value.
-		///           (Utility method, helps to avoid specifying the type parameter.) </summary>
+		///           of this entity, returning the previous value. </summary>
 		public static Option<T> Set<T>(this IEntityRef entity, T value) where T : IComponent =>
 			entity.Set(Option<T>.Some(value));
 		

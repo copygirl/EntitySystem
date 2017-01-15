@@ -45,17 +45,8 @@ namespace EntitySystem.Utility
 			(HasValue ? func(_value) : Option<TResult>.None);
 		
 		public Option<TResult> Cast<TResult>() =>
-			(HasValue ? (TResult)(object)_value : Option<TResult>.None);
-		
-		
-		public static implicit operator Option<T>(T value)
-		{
-			if (value == null) throw new ArgumentNullException(
-				"Implicit conversion to Option requires value to be non-null");
-			return Option<T>.Some(value);
-		}
-		
-		public static explicit operator T(Option<T> option) => option.Value;
+			HasValue ? Option<TResult>.Some((TResult)(object)_value)
+			         : Option<TResult>.None;
 		
 		
 		public override bool Equals(object obj) =>

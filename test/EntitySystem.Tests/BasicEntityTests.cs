@@ -25,7 +25,7 @@ namespace EntitySystem.Tests
 			
 			// Getting component
 			Assert.True(entity.Has<TestComponent>());
-			Assert.Equal(entity.Get<TestComponent>(), new TestComponent(10));
+			Assert.Equal(entity.Get<TestComponent>().Value, new TestComponent(10));
 			Assert.Contains(new TestComponent(10), entity.Components);
 			
 			// Removing component

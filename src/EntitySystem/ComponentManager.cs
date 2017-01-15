@@ -81,6 +81,9 @@ namespace EntitySystem
 			return _handlers.Values.SelectSome((map) => map.TryGet(entity));
 		}
 		
+		public Option<T> Set<T>(Entity entity, T value) where T : IComponent =>
+			Set(entity, Option<T>.Some(value));
+		
 		public Option<T> Set<T>(Entity entity, Option<T> value) where T : IComponent
 		{
 			var handler = GetHandler<T>();
