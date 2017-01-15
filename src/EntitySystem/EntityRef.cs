@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using EntitySystem.Utility;
 
@@ -21,21 +20,26 @@ namespace EntitySystem
 		
 		public Option<Entity> Entity => new Option<Entity>(_entity, Exists);
 		
-		public IEnumerable<IComponent> Components =>
-			_manager.Components.GetAll(Entity.Expect(() => new EntityNonExistantException(_manager, _entity)));
+		public IEnumerable<IComponent> Components { get {
+			if (!Exists) throw new EntityNonExistantException(_manager, _entity);
+			return _manager.Components.GetAll(_entity);
+		} }
 		
-		public Option<T> Get<T>() where T : IComponent =>
-			_manager.Components.Get<T>(Entity.Expect(() => new EntityNonExistantException(_manager, _entity)));
+		public Option<T> Get<T>() where T : IComponent {
+			if (!Exists) throw new EntityNonExistantException(_manager, _entity);
+			return _manager.Components.Get<T>(_entity);
+		}
 		
-		public Option<T> Set<T>(Option<T> value) where T : IComponent =>
-			_manager.Components.Set<T>(Entity.Expect(() => new EntityNonExistantException(_manager, _entity)), value);
+		public Option<T> Set<T>(Option<T> value) where T : IComponent {
+			if (!Exists) throw new EntityNonExistantException(_manager, _entity);
+			return _manager.Components.Set<T>(_entity, value);
+		}
 		
 		// ToString / Casting
 		
-		public override string ToString() =>
-			$"[{ nameof(EntityRef) } { _entity.ID }]";
+		public override string ToString() => $"[{ nameof(EntityRef) } { _entity.ID }]";
 		
 		public static implicit operator Entity(EntityRef entityRef) =>
-			entityRef.Entity.Expect(() => new InvalidOperationException());
+			entityRef.Entity.OrDefault();
 	}
 }
