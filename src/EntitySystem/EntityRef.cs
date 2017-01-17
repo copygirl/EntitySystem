@@ -3,11 +3,21 @@ using EntitySystem.Utility;
 
 namespace EntitySystem
 {
-	public class EntityRef : IEntityRef
+	/// <summary>
+	/// Represents a reference to an entity managed by an EntityManager,
+	/// allowing for read / write access to its components.
+	/// 
+	/// Note that keeping around an instance of this type may result in
+	/// exceptions or unexpected behavior when accessing components if
+	/// the entity doesn't exist anymore or the Entity value is reused.
+	/// </summary>
+	public struct EntityRef : IEntityRef
 	{
 		readonly EntityManager _manager;
 		readonly Entity _entity;
 		
+		// FIXME: Exists may return true if a new entity
+		//        is recreated using the same Entity key.
 		public bool Exists => _manager.Has(_entity);
 		
 		internal EntityRef(EntityManager manager, Entity entity)

@@ -4,6 +4,8 @@ using EntitySystem.Utility;
 
 namespace EntitySystem
 {
+	/// <summary> Represents a reference to an entity, allowing
+	///           for read / write access to its components. </summary>
 	public interface IEntityRef
 	{
 		/// <summary> Returns the Entity value associated with this entity reference, if any. </summary>
